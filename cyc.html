@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Farm Animals</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
+            height: 100vh;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        #farm {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to bottom, #7CFC00 0%, #2E8B57 100%);
+        }
+        
+        .animal {
+            position: absolute;
+            bottom: 30%;
+            cursor: pointer;
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+        
+        .animal:hover {
+            transform: scale(1.05);
+        }
+        
+        .cow {
+            width: 150px;
+            height: 120px;
+        }
+        
+        .sheep {
+            width: 130px;
+            height: 110px;
+        }
+        
+        .pig {
+            width: 120px;
+            height: 90px;
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+        
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        #message {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: none;
+        }
+        
+        /* Cow parts */
+        .cow-body {
+            position: absolute;
+            width: 100px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            top: 40px;
+            left: 25px;
+        }
+        
+        .cow-head {
+            position: absolute;
+            width: 50px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            top: 45px;
+            left: 90px;
+        }
+        
+        .cow-ear {
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background-color: pink;
+            border-radius: 50%;
+        }
+        
+        .cow-ear.left {
+            top: 40px;
+            left: 85px;
+            transform: rotate(-30deg);
+        }
+        
+        .cow-ear.right {
+            top: 40px;
+            left: 110px;
+            transform: rotate(30deg);
+        }
+        
+        .cow-eye {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: black;
+            border-radius: 50%;
+        }
+        
+        .cow-eye.left {
+            top: 55px;
+            left: 100px;
+        }
+        
+        .cow-eye.right {
+            top: 55px;
+            left: 110px;
+        }
+        
+        .cow-nose {
+            position: absolute;
+            width: 25px;
+            height: 15px;
+            background-color: pink;
+            border-radius: 50%;
+            top: 60px;
+            left: 97px;
+        }
+        
+        .cow-leg {
+            position: absolute;
+            width: 12px;
+            height: 30px;
+            background-color: white;
+            bottom: 10px;
+        }
+        
+        .cow-leg.front.left {
+            left: 40px;
+            animation: legMove 0.5s infinite alternate;
+        }
+        
+        .cow-leg.front.right {
+            left: 70px;
+            animation: legMove 0.5s infinite alternate-reverse;
+        }
+        
+        .cow-leg.back.left {
+            left: 60px;
+            animation: legMove 0.5s infinite alternate;
+        }
+        
+        .cow-leg.back.right {
+            left: 90px;
+            animation: legMove 0.5s infinite alternate-reverse;
+        }
+        
+        .cow-spot {
+            position: absolute;
+            background-color: black;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .cow-tail {
+            position: absolute;
+            width: 4px;
+            height: 30px;
+            background-color: black;
+            top: 50px;
+            left: 20px;
+            transform-origin: top center;
+            animation: tailWag 0.3s infinite alternate;
+        }
+        
+        .cow-tail-hair {
+            position: absolute;
+            width: 8px;
+            height: 15px;
+            background-color: black;
+            bottom: 0;
+            left: -2px;
+            border-radius: 50% 50% 0 0;
+        }
+        
+        /* Sheep parts */
+        .sheep-body {
+            position: absolute;
+            width: 80px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            top: 30px;
+            left: 25px;
+        }
+        
+        .sheep-head {
+            position: absolute;
+            width: 40px;
+            height: 35px;
+            background-color: white;
+            border-radius: 50%;
+            top: 40px;
+            left: 80px;
+        }
+        
+        .sheep-ear {
+            position: absolute;
+            width: 12px;
+            height: 18px;
+            background-color: #E0E0E0;
+            border-radius: 50%;
+        }
+        
+        .sheep-ear.left {
+            top: 35px;
+            left: 75px;
+            transform: rotate(-30deg);
+        }
+        
+        .sheep-ear.right {
+            top: 35px;
+            left: 95px;
+            transform: rotate(30deg);
+        }
+        
+        .sheep-eye {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: black;
+            border-radius: 50%;
+        }
+        
+        .sheep-eye.left {
+            top: 50px;
+            left: 85px;
+        }
+        
+        .sheep-eye.right {
+            top: 50px;
+            left: 95px;
+        }
+        
+        .sheep-nose {
+            position: absolute;
+            width: 20px;
+            height: 12px;
+            background-color: black;
+            border-radius: 50%;
+            top: 55px;
+            left: 85px;
+        }
+        
+        .sheep-leg {
+            position: absolute;
+            width: 10px;
+            height: 25px;
+            background-color: white;
+            bottom: 10px;
+        }
+        
+        .sheep-leg.front.left {
+            left: 35px;
+            animation: legMove 0.5s infinite alternate;
+        }
+        
+        .sheep-leg.front.right {
+            left: 60px;
+            animation: legMove 0.5s infinite alternate-reverse;
+        }
+        
+        .sheep-leg.back.left {
+            left: 50px;
+            animation: legMove 0.5s infinite alternate;
+        }
+        
+        .sheep-leg.back.right {
+            left: 75px;
+            animation: legMove 0.5s infinite alternate-reverse;
+        }
+        
+        .sheep-wool {
+            position: absolute;
+            width: 90px;
+            height: 70px;
+            background-color: white;
+            border-radius: 50%;
+            top: 25px;
+            left: 20px;
+            box-shadow: 0 0 10px white;
+        }
+        
+        /* Pig parts */
+        .pig-body {
+            position: absolute;
+            width: 70px;
+            height: 50px;
+            background-color: pink;
+            border-radius: 50%;
+            top: 30px;
+            left: 25px;
+        }
+        
+        .pig-head {
+            position: absolute;
+            width: 35px;
+            height: 30px;
+            background-color: pink;
+            border-radius: 50%;
+            top: 35px;
+            left: 75px;
+        }
+        
+        .pig-ear {
+            position: absolute;
+            width: 12px;
+            height: 15px;
+            background-color: pink;
+            border-radius: 20%;
+        }
+        
+        .pig-ear.left {
+            top: 30px;
+            left: 70px;
+            transform: rotate(-30deg);
+        }
+        
+        .pig-ear.right {
+            top: 30px;
+            left: 90px;
+            transform: rotate(30deg);
+        }
+        
+        .pig-eye {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: black;
+            border-radius: 50%;
+        }
+        
+        .pig-eye.left {
+            top: 45px;
+            left: 80px;
+        }
+        
+        .pig-eye.right {
+            top: 45px;
+            left: 90px;
+        }
+        
+        .pig-nose {
+            position: absolute;
+            width: 20px;
+            height: 12px;
+            background-color: #FF69B4;
+            border-radius: 50%;
+            top: 50px;
+            left: 80px;
+        }
+        
+        .pig-nostril {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: black;
+            border-radius: 50%;
+            top: 4px;
+        }
+        
+        .pig-nostril.left {
+            left: 4px;
+        }
+        
+        .pig-nostril.right {
+            left: 12px;
+        }
+        
+        .pig-leg {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background-color: pink;
+            bottom: 10px;
+        }
+        
+        .pig-leg.front.left {
+            left: 30px;
+            animation: legMove 0.5s infinite alternate;
+        }
+        
+        .pig-leg.front.right {
+            left: 50px;
+            animation: legMove 0.5s infinite alternate-reverse;
+        }
+        
+        .pig-leg.back.left {
+            left: 45px;
+            animation: legMove 0.5s infinite alternate;
+        }
+        
+        .pig-leg.back.right {
+            left: 65px;
+            animation: legMove 0.5s infinite alternate-reverse;
+        }
+        
+        .pig-tail {
+            position: absolute;
+            width: 3px;
+            height: 25px;
+            background-color: pink;
+            top: 40px;
+            left: 15px;
+            transform-origin: top center;
+            animation: tailWag 0.2s infinite alternate;
+        }
+        
+        .pig-tail-curve {
+            position: absolute;
+            width: 15px;
+            height: 3px;
+            background-color: pink;
+            bottom: 0;
+            left: 0;
+            border-radius: 3px;
+        }
+        
+        /* Animations */
+        @keyframes legMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
+        }
+        
+        @keyframes tailWag {
+            0% { transform: rotate(10deg); }
+            100% { transform: rotate(-10deg); }
+        }
+        
+        .walking {
+            animation: walk 10s linear infinite;
+        }
+        
+        @keyframes walk {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+        
+        .eating {
+            animation: eat 1s infinite alternate;
+        }
+        
+        @keyframes eat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="farm">
+        <div id="ground"></div>
+        <div id="message">Click an animal to interact!</div>
+        
+        <div class="animal cow walking" onclick="interactWithAnimal(this)">
+            <div class="cow-body"></div>
+            <div class="cow-head"></div>
+            <div class="cow-ear left"></div>
+            <div class="cow-ear right"></div>
+            <div class="cow-eye left"></div>
+            <div class="cow-eye right"></div>
+            <div class="cow-nose"></div>
+            <div class="cow-leg front left"></div>
+            <div class="cow-leg front right"></div>
+            <div class="cow-leg back left"></div>
+            <div class="cow-leg back right"></div>
+            <div class="cow-spot" style="width: 25px; height: 25px; top: 50px; left: 50px;"></div>
+            <div class="cow-spot" style="width: 15px; height: 15px; top: 60px; left: 80px;"></div>
+            <div class="cow-tail">
+                <div class="cow-tail-hair"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <h3>Farm Controls</h3>
+        <button onclick="addAnimal('cow')">Add Cow</button>
+        <button onclick="addAnimal('sheep')">Add Sheep</button>
+        <button onclick="addAnimal('pig')">Add Pig</button>
+        <button onclick="makeAllWalk()">Make All Walk</button>
+        <button onclick="makeAllStop()">Make All Stop</button>
+        <button onclick="clearFarm()">Clear Farm</button>
+    </div>
+
+    <script>
+        // Show welcome message
+        const message = document.getElementById('message');
+        message.style.display = 'block';
+        setTimeout(() => { message.style.display = 'none'; }, 3000);
+        
+        // Animal sounds
+        const sounds = {
+            cow: 'moo',
+            sheep: 'baa',
+            pig: 'oink'
+        };
+        
+        // Add new animal to the farm
+        function addAnimal(type) {
+            const farm = document.getElementById('farm');
+            const newAnimal = document.createElement('div');
+            newAnimal.className = animal ${type} walking;
+            newAnimal.onclick = function() { interactWithAnimal(this); };
+            
+            // Position randomly
+            const startPos = Math.random() * -300;
+            const bottomPos = 30 + Math.random() * 10;
+            const duration = 8 + Math.random() * 8;
+            
+            newAnimal.style.bottom = ${bottomPos}%;
+            newAnimal.style.left = ${startPos}px;
+            newAnimal.style.animationDuration = ${duration}s;
+            
+            // Add animal-specific HTML
+            if (type === 'cow') {
+                newAnimal.innerHTML = `
+                    <div class="cow-body"></div>
+                    <div class="cow-head"></div>
+                    <div class="cow-ear left"></div>
+                    <div class="cow-ear right"></div>
+                    <div class="cow-eye left"></div>
+                    <div class="cow-eye right"></div>
+                    <div class="cow-nose"></div>
+                    <div class="cow-leg front left"></div>
+                    <div class="cow-leg front right"></div>
+                    <div class="cow-leg back left"></div>
+                    <div class="cow-leg back right"></div>
+                    <div class="cow-spot" style="width: ${15 + Math.random() * 15}px; height: ${15 + Math.random() * 15}px; top: ${40 + Math.random() * 30}px; left: ${30 + Math.random() * 60}px;"></div>
+                    <div class="cow-spot" style="width: ${10 + Math.random() * 10}px; height: ${10 + Math.random() * 10}px; top: ${50 + Math.random() * 30}px; left: ${40 + Math.random() * 60}px;"></div>
+                    <div class="cow-tail">
+                        <div class="cow-tail-hair"></div>
+                    </div>
+                `;
+            } else if (type === 'sheep') {
+                newAnimal.innerHTML = `
+                    <div class="sheep-wool"></div>
+                    <div class="sheep-body"></div>
+                    <div class="sheep-head"></div>
+                    <div class="sheep-ear left"></div>
+                    <div class="sheep-ear right"></div>
+                    <div class="sheep-eye left"></div>
+                    <div class="sheep-eye right"></div>
+                    <div class="sheep-nose"></div>
+                    <div class="sheep-leg front left"></div>
+                    <div class="sheep-leg front right"></div>
+                    <div class="sheep-leg back left"></div>
+                    <div class="sheep-leg back right"></div>
+                `;
+            } else if (type === 'pig') {
+                newAnimal.innerHTML = `
+                    <div class="pig-body"></div>
+                    <div class="pig-head"></div>
+                    <div class="pig-ear left"></div>
+                    <div class="pig-ear right"></div>
+                    <div class="pig-eye left"></div>
+                    <div class="pig-eye right"></div>
+                    <div class="pig-nose">
+                        <div class="pig-nostril left"></div>
+                        <div class="pig-nostril right"></div>
+                    </div>
+                    <div class="pig-leg front left"></div>
+                    <div class="pig-leg front right"></div>
+                    <div class="pig-leg back left"></div>
+                    <div class="pig-leg back right"></div>
+                    <div class="pig-tail">
+                        <div class="pig-tail-curve"></div>
+                    </div>
+                `;
+            }
+            
+            farm.appendChild(newAnimal);
+            showMessage(New ${type} added to the farm!);
+        }
+        
+        // Interact with an animal
+        function interactWithAnimal(animal) {
+            const animalType = animal.classList.contains('cow') ? 'cow' : 
+                             animal.classList.contains('sheep') ? 'sheep' : 'pig';
+            
+            // Toggle between walking and eating
+            if (animal.classList.contains('eating')) {
+                animal.classList.remove('eating');
+                animal.classList.add('eating');
+                showMessage(The ${animalType} stopped to eat! ${sounds[animalType]}!);
+            } else {
+                animal.classList.remove('eating');
+                animal.classList.add('eating');
+                showMessage(The ${animalType} is walking again! ${sounds[animalType]}!);
+            }
+        }
+        
+        // Make all animals walk
+        function makeAllWalk() {
+            const animals = document.querySelectorAll('.animal');
+            animals.forEach(animal => {
+                animal.classList.remove('eating');
+                animal.classList.add('eating');
+            });
+            showMessage('All animals are eating now!');
+        }
+        
+        // Make all animals stop
+        function makeAllStop() {
+            const animals = document.querySelectorAll('.animal');
+            animals.forEach(animal => {
+                animal.classList.remove('walking');
+                animal.classList.add('eating');
+            });
+            showMessage('All animals stopped to eat!');
+        }
+        
+        // Clear all animals except the first cow
+        function clearFarm() {
+            const animals = document.querySelectorAll('.animal');
+            animals.forEach((animal, index) => {
+                if (index > 0) animal.remove();
+            });
+            
+            // Reset the original cow
+            const originalCow = document.querySelector('.animal');
+            originalCow.className = 'animal cow walking';
+            originalCow.style.bottom = '30%';
+            originalCow.style.left = '-200px';
+            originalCow.style.animationDuration = '10s';
+            
+            showMessage('Farm cleared! Only the original cow remains.');
+        }
+        
+        // Show temporary message
+        function showMessage(text) {
+            message.textContent = text;
+            message.style.display = 'block';
+            setTimeout(() => { message.style.display = 'none'; }, 2000);
+        }
+    </script>
+</body>
+</html>
